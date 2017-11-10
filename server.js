@@ -72,6 +72,42 @@ app.get('/api/employees' , function(req,res){
 	});
 });
 
+app.post('/api/employees', (req,res) => {
+	var employee = req.body;
+	//console.log(user, req.body, "==================> users")
+	Employee.addEmployees(employee , (err ,employee) => {
+		if(err) {
+				throw err;
+		}
+		res.json (employee);
+	});
+});
+
+app.put('/api/employees/:_id' , (req,res) => {
+	var id = req.params._id;
+	var employee = req.body;
+
+	Employee.updateEmployees(id , employee, {new: true} , (err , employee) => {
+			if (err) {
+				throw err;
+			}
+
+			res.json(employee);
+	});
+});
+
+app.delete('/api/employees/:_id' , (req , res ) => {
+	var id = req.params._id;
+	Employee.deleteEmployees(id, (err , user) => {
+		if(err) {
+				throw err;
+
+		}
+
+		res.json(user);
+	});
+});
+
 
 app.listen(2000);
 console.log("server at listening at 2000 port");

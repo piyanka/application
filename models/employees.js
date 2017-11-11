@@ -1,5 +1,5 @@
 var  mongoose = require('mongoose');
-
+var multer = require('multer');
 //  user schema
 
 var employeeSchema = mongoose.Schema({
@@ -17,9 +17,11 @@ var employeeSchema = mongoose.Schema({
 	address : {
 		type: String,
 	},
-	photo : {
-		type: String
+	profileImage : {
+			type: String,
+			required : true
 	}
+		
 
 });
 
@@ -48,7 +50,7 @@ module.exports.updateEmployees = function(id, employee , callback , options ){
 		status : employee.status,
 		age : employee.age,
 		address : employee.address,
-		photo : employee.photo
+		profileImage : employee.profileImage
 	}
 	Employee.findOneAndUpdate(query, update, options, callback);
 }

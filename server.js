@@ -1,5 +1,7 @@
 var express = require('express');
 var app = express();
+var multer = require('multer');
+var path = require('path');
 var bodyParser = require('body-parser');
 var mongoose = require('mongoose');
 
@@ -8,12 +10,39 @@ Employee = require('./models/employees');
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended : false}));
+
+
 //connect to mongoose
 mongoose.connect('mongodb://localhost/employees');
 var db = mongoose.connection;
 
+// Init upload
+
+var storage = multer.diskStorage ({
+	destination: function(req,file, cb) {
+		cb(null ,'uploads/')
+	},
+	filename: function (req,file,cb) {
+		cb(null ,file.fieldname + '-' + Date.now() + '.jpg')
+	}
+});
+
+var upload = multer({ storage : storage }).single('profileImage');
+
+app.post('/profile/:id', function(req, res) {
+  upload(req, res, function(err) {
+    if(err) {
+      return res.status(400).json({msg: err});
+    }
+    Employee.update({_id: req.params.id}, {$set: {profileImage: req.file.path}}, function(err, result) {
+        if(err)
+          return res.status(400).json({msg: err});
+        return res.status(200).json({msg:"image uploaded"})
+      });
+  }); 
+});
 app.get('/' , function(req,res){
-	res.send('hii');
+	res.send('hii'); 
 
 });
 
@@ -75,6 +104,7 @@ app.get('/api/employees' , function(req,res){
 app.post('/api/employees', (req,res) => {
 	var employee = req.body;
 	//console.log(user, req.body, "==================> users")
+
 	Employee.addEmployees(employee , (err ,employee) => {
 		if(err) {
 				throw err;
@@ -104,7 +134,7 @@ app.delete('/api/employees/:_id' , (req , res ) => {
 
 		}
 
-		res.json(user);
+		res.json(employee);
 	});
 });
 
